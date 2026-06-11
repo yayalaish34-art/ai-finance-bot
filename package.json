@@ -1,0 +1,25 @@
+{
+  "name": "ai-finance-bot",
+  "version": "1.0.0",
+  "description": "AI-powered personal finance assistant via WhatsApp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "googleapis": "^128.0.0",
+    "groq-sdk": "^1.2.1",
+    "multer": "^2.1.1",
+    "node-cron": "^4.2.1",
+    "openai": "^4.20.0",
+    "pdf-parse": "^2.4.5",
+    "twilio": "^4.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
