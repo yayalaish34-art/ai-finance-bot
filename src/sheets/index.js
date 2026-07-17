@@ -68,7 +68,7 @@ async function ensureUser(userId, name) {
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
     range: "Users!A:E",
-    valueInputOption: "USER_ENTERED",
+    valueInputOption: "RAW",
     requestBody: { values: [[userId, name || "", userId, now, now]] },
   });
 
@@ -95,7 +95,7 @@ async function logTransaction(userId, transaction) {
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
     range: "Transactions!A:G",
-    valueInputOption: "USER_ENTERED",
+    valueInputOption: "RAW",
     requestBody: { values: [row] },
   });
 
@@ -146,7 +146,7 @@ async function saveSplit(userId, splitPlan, totalAmount) {
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
     range: "Splits!A:E",
-    valueInputOption: "USER_ENTERED",
+    valueInputOption: "RAW",
     requestBody: { values: rows },
   });
 }
@@ -164,6 +164,23 @@ async function getAccountBalances(userId) {
     .map(([, account, balance]) => ({ account, balance: parseFloat(balance) || 0 }));
 }
 
+// ── Find a known user by phone (last-9-digits match) ─────────────────────────
+// Used by the Grow webhook to route an incoming payment to the right user.
+function normalizePhone(raw) {
+  const digits = String(raw || "").replace(/\D/g, "");
+  return digits.length >= 9 ? digits.slice(-9) : null;
+}
+
+async function findUserByPhone(phone) {
+  const target = normalizePhone(phone);
+  if (!target) return null;
+  if (!usersLoaded) await new Promise((r) => setTimeout(r, 500));
+  for (const userId of knownUsers.keys()) {
+    if (normalizePhone(userId) === target) return userId;
+  }
+  return null;
+}
+
 module.exports = {
   ensureUser,
   logTransaction,
@@ -171,4 +188,6 @@ module.exports = {
   getThisMonthTransactions,
   saveSplit,
   getAccountBalances,
+  findUserByPhone,
+  normalizePhone,
 };

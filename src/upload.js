@@ -198,8 +198,8 @@ router.post("/statement", upload.single("statement"), async (req, res) => {
 
 // ── AI transaction extractor ──────────────────────────────────────────────────
 async function extractTransactionsFromText(text) {
-  const Groq = require("groq-sdk");
-  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  const OpenAI = require("openai");
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   // Split text into chunks of 3000 chars each
   const chunkSize = 3000;
@@ -240,8 +240,8 @@ ${sample}
 `;
 
     try {
-      const res = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
+      const res = await openai.chat.completions.create({
+        model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
         max_tokens: 2000,
       });

@@ -7,7 +7,7 @@ A WhatsApp-based personal finance assistant for Nigeria. Log transactions, ask q
 ## What It Does
 
 - **Log transactions** by typing on WhatsApp: `spent 5000 transport uber`
-- **Auto-capture income** via Paystack webhooks (automatic)
+- **Auto-capture income** via Grow/Meshulam payment webhooks (automatic)
 - **AI-powered Q&A**: Ask anything — *"Where is my money leaking?"*
 - **Savings split engine**: Income auto-split into buckets (Savings, Investment, etc.)
 - **Monthly reports**: Full breakdown on demand
@@ -47,20 +47,21 @@ Run the setup script:
 node src/sheets/setup.js
 ```
 
-### 4. Set Up Twilio WhatsApp
+### 4. Set Up WaSender WhatsApp
 
-1. Sign up at [twilio.com](https://twilio.com)
-2. Go to **Messaging → Try it out → Send a WhatsApp message**
-3. Follow the sandbox setup instructions
-4. Set the incoming webhook URL to: `https://your-domain.com/whatsapp/incoming`
-5. Copy your Account SID, Auth Token, and WhatsApp number to `.env`
+1. Sign up at [wasenderapi.com](https://www.wasenderapi.com)
+2. Connect your WhatsApp number by scanning the QR code
+3. Set the incoming webhook URL to: `https://your-domain.com/whatsapp/incoming`
+   (subscribe to the `messages.received` event)
+4. Copy your API key into `.env` as `WASENDER_API_KEY`
 
-### 5. Set Up Paystack Webhooks (Optional)
+### 5. Set Up Grow / Meshulam Webhooks (Optional)
 
-1. Log into your Paystack dashboard
-2. Go to **Settings → API Keys & Webhooks**
-3. Set webhook URL to: `https://your-domain.com/webhooks/paystack`
-4. Copy your Secret Key to `.env`
+1. Log into your Grow (Meshulam) dashboard and contact support to enable webhooks
+2. Set the webhook URL to: `https://your-domain.com/webhooks/grow-webhook?key=<YOUR_KEY>`
+3. Copy your webhook key(s) into `.env` as `GROW_WEBHOOK_KEY` (and `GROW_WEBHOOK_KEY_2` for standing orders)
+
+Any successful payment is logged as income and routed to the user by phone number.
 
 ### 6. Start the Bot
 
@@ -77,7 +78,7 @@ npm start
 Use [ngrok](https://ngrok.com) to expose your local server:
 ```bash
 npx ngrok http 3000
-# Copy the https URL and use it in Twilio + Paystack webhook settings
+# Copy the https URL and use it in WaSender + Grow webhook settings
 ```
 
 ---
@@ -138,7 +139,7 @@ ai-finance-bot/
 ├── .env.example              # Environment variable template
 ├── src/
 │   ├── webhooks/
-│   │   └── paystack.js       # Handles Paystack payment events
+│   │   └── grow.js           # Handles Grow/Meshulam payment webhooks
 │   ├── sheets/
 │   │   ├── index.js          # Read/write Google Sheets
 │   │   └── setup.js          # One-time sheet setup script
@@ -178,7 +179,7 @@ pm2 save
 ## Roadmap
 
 - [ ] Mono/Okra integration for live bank balance reading
-- [ ] Automatic Paystack transfers for savings splits
+- [ ] Automatic Grow transfers for savings splits
 - [ ] Weekly trend analysis reports
 - [ ] Spending anomaly alerts
 - [ ] Budget goal tracking

@@ -1,9 +1,9 @@
-const Groq = require("groq-sdk");
+const OpenAI = require("openai");
 const fs = require("fs");
 const path = require("path");
 const { getThisMonthTransactions, getAccountBalances } = require("../sheets");
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ── Persistent memory on disk ─────────────────────────────────────────────────
 const MEMORY_DIR = path.join(__dirname, "../../data/memory");
@@ -170,8 +170,8 @@ async function ask(userQuestion, userId, userName = "") {
   appendHistory(userId, "user", userContent);
   const history = getHistory(userId);
 
-  const res = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",   // ← Fast model: ~1-2s vs 10-15s for 70b
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
     messages: [
       { role: "system", content: buildSystemPrompt(firstName, profile) },
       ...history,
@@ -190,8 +190,8 @@ async function analyseStatement(userId, userName = "", statementText) {
   const firstName = userName ? userName.split(" ")[0] : "";
   const profile = loadProfile(userId);
 
-  const res = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
     messages: [
       { role: "system", content: buildSystemPrompt(firstName, profile) },
       {

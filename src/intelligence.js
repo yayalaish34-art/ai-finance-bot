@@ -1,9 +1,9 @@
 const cron = require("node-cron");
-const Groq = require("groq-sdk");
+const OpenAI = require("openai");
 const { getThisMonthTransactions, getAllTransactions } = require("./sheets");
 const { getSplitRules } = require("./rules");
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const fmt = (n) => "₦" + Math.abs(n).toLocaleString();
 
 async function analyseSpending() {
@@ -72,8 +72,8 @@ Format exactly:
 INSIGHT: [observation]
 SUGGESTION: [product suggestion]`;
 
-  const res = await groq.chat.completions.create({
-    model: "llama3-70b-8192",
+  const res = await openai.chat.completions.create({
+    model: "gpt-4o",
     messages: [{ role: "user", content: prompt }],
     max_tokens: 200,
   });

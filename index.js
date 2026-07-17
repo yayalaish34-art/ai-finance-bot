@@ -7,10 +7,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-const webhookRoutes = require("./src/webhooks/paystack");
 const whatsappRoutes = require("./src/whatsapp/bot");
 
-app.use("/webhooks", webhookRoutes);
+app.use("/webhooks", require("./src/webhooks/grow"));
 app.use("/whatsapp", whatsappRoutes);
 app.use("/upload", require("./src/upload"));
 
