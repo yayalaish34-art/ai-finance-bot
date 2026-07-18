@@ -3,7 +3,16 @@ const OpenAI = require("openai");
 const { getThisMonthTransactions, getAllTransactions } = require("./sheets");
 const { getSplitRules } = require("./rules");
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let _openai;
+function getOpenAI() {
+  if (!_openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is missing — set it in your environment (Railway → Variables).");
+    }
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
 const fmt = (n) => "₦" + Math.abs(n).toLocaleString();
 
 async function analyseSpending() {
@@ -72,7 +81,7 @@ Format exactly:
 INSIGHT: [observation]
 SUGGESTION: [product suggestion]`;
 
-  const res = await openai.chat.completions.create({
+  const res = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: prompt }],
     max_tokens: 200,

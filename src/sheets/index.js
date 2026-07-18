@@ -1,9 +1,17 @@
 const { google } = require("googleapis");
 
 function getAuth() {
+  const key = process.env.GOOGLE_PRIVATE_KEY;
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  if (!key || !email) {
+    throw new Error(
+      "Missing Google Sheets credentials: set GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_PRIVATE_KEY " +
+      "in your environment (Railway → Variables)."
+    );
+  }
   return new google.auth.JWT({
-    email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    email,
+    key: key.replace(/\\n/g, "\n"),
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
 }

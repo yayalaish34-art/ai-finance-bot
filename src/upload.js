@@ -199,6 +199,9 @@ router.post("/statement", upload.single("statement"), async (req, res) => {
 // ── AI transaction extractor ──────────────────────────────────────────────────
 async function extractTransactionsFromText(text) {
   const OpenAI = require("openai");
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is missing — set it in your environment (Railway → Variables).");
+  }
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   // Split text into chunks of 3000 chars each

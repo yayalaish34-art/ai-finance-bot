@@ -3,7 +3,18 @@ const fs = require("fs");
 const path = require("path");
 const { getThisMonthTransactions, getAccountBalances } = require("../sheets");
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Lazy client — don't crash the whole app at load time if the key is missing;
+// fail only when an AI call is actually made.
+let _openai;
+function getOpenAI() {
+  if (!_openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is missing — set it in your environment (Railway → Variables).");
+    }
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
 
 // ── Persistent memory on disk ─────────────────────────────────────────────────
 const MEMORY_DIR = path.join(__dirname, "../../data/memory");
@@ -170,7 +181,7 @@ async function ask(userQuestion, userId, userName = "") {
   appendHistory(userId, "user", userContent);
   const history = getHistory(userId);
 
-  const res = await openai.chat.completions.create({
+  const res = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
     messages: [
       { role: "system", content: buildSystemPrompt(firstName, profile) },
@@ -190,7 +201,7 @@ async function analyseStatement(userId, userName = "", statementText) {
   const firstName = userName ? userName.split(" ")[0] : "";
   const profile = loadProfile(userId);
 
-  const res = await openai.chat.completions.create({
+  const res = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
     messages: [
       { role: "system", content: buildSystemPrompt(firstName, profile) },
