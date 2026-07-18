@@ -13,7 +13,7 @@ function getOpenAI() {
   }
   return _openai;
 }
-const fmt = (n) => "₦" + Math.abs(n).toLocaleString();
+const fmt = (n) => "₪" + Math.abs(n).toLocaleString();
 
 async function analyseSpending() {
   const transactions = await getThisMonthTransactions();
@@ -64,16 +64,16 @@ async function detectHabits() {
 
 async function getHabitInsight(habits, analysis) {
   if (!habits) return null;
-  const prompt = `You are a Nigerian financial coach offering these products:
+  const prompt = `You are an Israeli financial coach offering these products:
 1. Financial Coaching Session
 2. Savings Challenge Program (90-day plan)
-3. Investment Starter Plan (Nigeria)
+3. Investment Starter Plan (Israel)
 4. Budget Mastery Course
 
 User data:
 - Savings rate: ${habits.savingsRate}%
 - Top spending: ${habits.topCategory} (${habits.topCategoryCount} times)
-- Weekend spending: ₦${habits.weekendSpend.toLocaleString()} vs weekday: ₦${habits.weekdaySpend.toLocaleString()}
+- Weekend spending: ₪${habits.weekendSpend.toLocaleString()} vs weekday: ₪${habits.weekdaySpend.toLocaleString()}
 - Overspent categories: ${analysis.overspentBuckets.map(b => b.label).join(", ") || "none"}
 
 Give ONE honest observation and naturally suggest ONE product that fits.

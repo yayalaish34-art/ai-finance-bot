@@ -28,7 +28,7 @@ function calculateSplit(amount) {
 function formatSplitMessage(split) {
   const lines = Object.entries(split)
     .map(([bucket, { percent, amount }]) =>
-      `• ${bucket} (${percent}%): ₦${amount.toLocaleString()}`
+      `• ${bucket} (${percent}%): ₪${amount.toLocaleString()}`
     )
     .join("\n");
 

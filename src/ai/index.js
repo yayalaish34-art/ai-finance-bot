@@ -101,20 +101,20 @@ function buildContextString({ transactions, accounts }) {
 
   return `
 FINANCIAL DATA (This Month):
-- Total Income: ₦${totalIncome.toLocaleString()}
-- Total Expenses: ₦${totalExpenses.toLocaleString()}
-- Net Savings: ₦${(totalIncome - totalExpenses).toLocaleString()}
+- Total Income: ₪${totalIncome.toLocaleString()}
+- Total Expenses: ₪${totalExpenses.toLocaleString()}
+- Net Savings: ₪${(totalIncome - totalExpenses).toLocaleString()}
 - Savings Rate: ${savingsRate}%
-- Total Balance: ₦${totalBalance.toLocaleString()}
+- Total Balance: ₪${totalBalance.toLocaleString()}
 
 SPENDING BY CATEGORY:
-${Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([c, a]) => `- ${c}: ₦${a.toLocaleString()}`).join("\n") || "No expenses yet"}
+${Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([c, a]) => `- ${c}: ₪${a.toLocaleString()}`).join("\n") || "No expenses yet"}
 
 ACCOUNT BALANCES:
-${accounts.map((a) => `- ${a.account}: ₦${a.balance.toLocaleString()}`).join("\n") || "No accounts yet"}
+${accounts.map((a) => `- ${a.account}: ₪${a.balance.toLocaleString()}`).join("\n") || "No accounts yet"}
 
 RECENT TRANSACTIONS (last 10):
-${transactions.slice(-10).map((t) => `- [${t.date}] ${t.type.toUpperCase()} ₦${t.amount.toLocaleString()} | ${t.category}${t.note ? ` | ${t.note}` : ""}`).join("\n") || "No transactions yet"}
+${transactions.slice(-10).map((t) => `- [${t.date}] ${t.type.toUpperCase()} ₪${t.amount.toLocaleString()} | ${t.category}${t.note ? ` | ${t.note}` : ""}`).join("\n") || "No transactions yet"}
 `.trim();
 }
 
@@ -124,7 +124,7 @@ function buildSystemPrompt(firstName, profile) {
     ? `\nUSER PROFILE: ${JSON.stringify(profile)}`
     : "";
 
-  return `You are Manager — a professional, assertive, and warm Nigerian personal finance assistant.
+  return `You are Manager — a professional, assertive, and warm Israeli personal finance assistant.
 The user's name is ${firstName || "there"}.${profileNote}
 
 PERSONALITY:
@@ -140,7 +140,7 @@ TONE EXAMPLES:
 - Minor issue: "That transport spend is creeping up quietly. Worth watching."
 - Serious issue: "Your savings are zero this month. Here is what needs to happen."
 - Win: "25% savings rate. That is exactly the discipline that builds wealth."
-- Banter: "₦12,000 on food this week? Either you are feeding a crowd or your kitchen is very ambitious."
+- Banter: "₪400 on food this week? Either you are feeding a crowd or your kitchen is very ambitious."
 
 RESPONSE LENGTH RULES:
 - Greetings: 1-2 sentences max. Warm, brief. ONE question only.
@@ -149,12 +149,12 @@ RESPONSE LENGTH RULES:
 - Never overwhelm with information upfront.
 
 RULES:
-- Always use ₦ symbol
+- Always use the ₪ (shekel) symbol for money
 - Address the user by first name when you know it
 - Never repeat the same point twice in one conversation
 - End finance replies with one clear specific action
-- If no data yet: tell them to type: spent 5000 food lunch
-- You understand Nigerian economic reality — inflation, irregular income, cost of living
+- If no data yet: tell them to type: spent 50 food lunch
+- You understand Israeli economic reality — cost of living, taxes, irregular income
 - You can analyse bank statements when users upload them as images or PDFs`;
 }
 
@@ -245,18 +245,18 @@ async function generateReport(userId, userName = "") {
   const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
 
   const name = userName ? userName.split(" ")[0] : "there";
-  const month = new Date().toLocaleString("en-NG", { month: "long", year: "numeric" });
+  const month = new Date().toLocaleString("he-IL", { month: "long", year: "numeric" });
 
   let report = `📊 *${name}'s Report — ${month}*\n\n`;
-  report += `💰 Income: ₦${totalIncome.toLocaleString()}\n`;
-  report += `💸 Expenses: ₦${totalExpenses.toLocaleString()}\n`;
-  report += `📈 Net Savings: ₦${netSavings.toLocaleString()} (${savingsRate}%)\n`;
-  report += `🏦 Total Balance: ₦${totalBalance.toLocaleString()}\n`;
+  report += `💰 Income: ₪${totalIncome.toLocaleString()}\n`;
+  report += `💸 Expenses: ₪${totalExpenses.toLocaleString()}\n`;
+  report += `📈 Net Savings: ₪${netSavings.toLocaleString()} (${savingsRate}%)\n`;
+  report += `🏦 Total Balance: ₪${totalBalance.toLocaleString()}\n`;
 
   if (topCategories.length) {
     report += `\n*Top Spending:*\n`;
     topCategories.forEach(([cat, amt]) => {
-      report += `• ${cat}: ₦${amt.toLocaleString()}\n`;
+      report += `• ${cat}: ₪${amt.toLocaleString()}\n`;
     });
   }
 

@@ -48,7 +48,7 @@ router.get("/", (req, res) => {
         <div class="upload-area" onclick="document.getElementById('fileInput').click()">
           <div class="upload-icon">📄</div>
           <div class="upload-text">Click to select PDF</div>
-          <div class="upload-sub">Supports Opay, GTBank, Access, Moniepoint</div>
+          <div class="upload-sub">Supports Bank Hapoalim, Leumi, Discount, Mizrahi</div>
         </div>
         <div class="file-name" id="fileName"></div>
         
@@ -101,8 +101,8 @@ router.get("/", (req, res) => {
               resultEl.className = "result success";
               resultEl.innerHTML = "✅ <strong>Done!</strong><br><br>" +
                 "📊 Transactions found: <strong>" + data.count + "</strong><br>" +
-                "💚 Income: <strong>₦" + data.totalIncome + "</strong><br>" +
-                "🔴 Expenses: <strong>₦" + data.totalExpenses + "</strong><br><br>" +
+                "💚 Income: <strong>₪" + data.totalIncome + "</strong><br>" +
+                "🔴 Expenses: <strong>₪" + data.totalExpenses + "</strong><br><br>" +
                 "Everything saved to your Google Sheet. Check WhatsApp for your summary!";
             } else {
               resultEl.className = "result error";
@@ -176,9 +176,9 @@ router.post("/statement", upload.single("statement"), async (req, res) => {
     const summary =
       `📄 *Bank Statement Uploaded*\n\n` +
       `✅ ${transactions.length} transactions extracted\n` +
-      `💚 Income: ₦${totalIncome.toLocaleString()}\n` +
-      `🔴 Expenses: ₦${totalExpenses.toLocaleString()}\n` +
-      `💰 Net: ₦${(totalIncome - totalExpenses).toLocaleString()}\n\n` +
+      `💚 Income: ₪${totalIncome.toLocaleString()}\n` +
+      `🔴 Expenses: ₪${totalExpenses.toLocaleString()}\n` +
+      `💰 Net: ₪${(totalIncome - totalExpenses).toLocaleString()}\n\n` +
       `All saved to your Google Sheet. Reply *report* to see your full summary.`;
 
     await sendMessage(process.env.YOUR_WHATSAPP_NUMBER, summary);
@@ -217,7 +217,7 @@ async function extractTransactionsFromText(text) {
     const sample = chunks[i];
 
     const prompt = `
-You are a Nigerian bank statement parser.
+You are an Israeli bank statement parser.
 Extract ALL transactions from this bank statement text.
 For each transaction return a JSON array with this exact format:
 [

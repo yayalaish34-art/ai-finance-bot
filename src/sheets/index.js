@@ -92,7 +92,7 @@ async function logTransaction(userId, transaction) {
 
   const row = [
     userId,
-    new Date().toLocaleDateString("en-NG"),
+    new Date().toLocaleDateString("he-IL"),
     type,
     amount,
     category,
@@ -108,7 +108,7 @@ async function logTransaction(userId, transaction) {
   });
 
   clearCache(userId);
-  console.log(`✅ [${userId}] ${type} ₦${amount} (${category})`);
+  console.log(`✅ [${userId}] ${type} ₪${amount} (${category})`);
   return row;
 }
 

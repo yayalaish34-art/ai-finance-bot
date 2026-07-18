@@ -116,7 +116,7 @@ async function processMessage(from, text, userName, msgData) {
         // Images can't be read without a vision API — tell user to send PDF instead
         return await sendMessage(
           from,
-          "📄 Please send your bank statement as a *PDF file* (not a photo). Most banking apps let you download your statement as PDF.\n\nFor GTBank, Access, Zenith etc: go to your app → Statements → Download PDF → Send here."
+          "📄 Please send your bank statement as a *PDF file* (not a photo). Most banking apps let you download your statement as PDF.\n\nFor Bank Hapoalim, Leumi, Discount, Mizrahi etc: go to your app → Statements → Download PDF → Send here."
         );
       }
 
@@ -177,7 +177,7 @@ async function processMessage(from, text, userName, msgData) {
     aiMod.bustSheetCache(from);
     return await sendMessage(
       from,
-      `💸 Logged: ₦${Number(amount).toLocaleString()} on ${category}${note ? ` (${note})` : ""}`
+      `💸 Logged: ₪${Number(amount).toLocaleString()} on ${category}${note ? ` (${note})` : ""}`
     );
   }
 
@@ -261,9 +261,9 @@ router.post("/incoming", async (req, res) => {
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 function formatSplitProposal(amount, split) {
-  let msg = `💰 *Income Received: ₦${amount.toLocaleString()}*\n\nHere's your savings split:\n\n`;
+  let msg = `💰 *Income Received: ₪${amount.toLocaleString()}*\n\nHere's your savings split:\n\n`;
   for (const [bucket, value] of Object.entries(split)) {
-    msg += `• ${bucket}: ₦${value.toLocaleString()}\n`;
+    msg += `• ${bucket}: ₪${value.toLocaleString()}\n`;
   }
   msg += `\nReply *YES* to save or *NO* to cancel.`;
   return msg;
@@ -273,7 +273,7 @@ function formatBalances(balances) {
   if (!balances || !balances.length) return "No balances found yet.";
   let msg = "💼 *Your Balances:*\n\n";
   for (const b of balances) {
-    msg += `• ${b.account}: ₦${Number(b.balance).toLocaleString()}\n`;
+    msg += `• ${b.account}: ₪${Number(b.balance).toLocaleString()}\n`;
   }
   return msg;
 }
@@ -284,12 +284,12 @@ function helpMenu(name) {
 Hi ${greeting}! Here's what I can do:
 
 *Log Expenses:*
-spent 5000 transport uber
-spent 15000 food shoprite
+spent 50 transport gett
+spent 250 food shufersal
 
 *Log Income:*
-received 100000 business client A
-received 50000 salary company
+received 8000 salary company
+received 2000 business client A
 
 *Upload Bank Statement (PDF only):*
 Send a PDF 📄 of your bank statement and I'll analyse it.
