@@ -12,6 +12,7 @@ const whatsappRoutes = require("./src/whatsapp/bot");
 app.use("/webhooks", require("./src/webhooks/grow"));
 app.use("/whatsapp", whatsappRoutes);
 app.use("/upload", require("./src/upload"));
+app.use("/chat", require("./src/webchat"));
 
 app.get("/", (req, res) => {
   res.json({ status: "AI Finance Bot is running ✅" });

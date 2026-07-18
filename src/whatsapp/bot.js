@@ -85,7 +85,9 @@ async function extractTextFromPDF(pdfBuffer) {
 }
 
 // ── Process an incoming message for one user ──────────────────────────────────
-async function processMessage(from, text, userName, msgData) {
+// `send` lets callers redirect the bot's replies. Defaults to WhatsApp (WaSender),
+// but the web chat injects its own collector so it can show replies in the browser.
+async function processMessage(from, text, userName, msgData, send = sendMessage) {
   const { ai: aiMod, sheets: sheetsMod, rules: rulesMod } = getModules();
 
   // Register user (fire and forget)
@@ -102,19 +104,19 @@ async function processMessage(from, text, userName, msgData) {
 
   if (hasImage || hasDocument) {
     try {
-      await sendMessage(from, "📄 Got it! Analysing your statement, give me a moment...");
+      await send(from, "📄 Got it! Analysing your statement, give me a moment...");
 
       let extractedText;
       const mediaData = hasImage ? hasImage : hasDocument;
       const mediaUrl = mediaData?.url;
 
       if (!mediaUrl) {
-        return await sendMessage(from, "⚠️ Could not access that file. Please try sending it again.");
+        return await send(from, "⚠️ Could not access that file. Please try sending it again.");
       }
 
       if (hasImage) {
         // Images can't be read without a vision API — tell user to send PDF instead
-        return await sendMessage(
+        return await send(
           from,
           "📄 Please send your bank statement as a *PDF file* (not a photo). Most banking apps let you download your statement as PDF.\n\nFor Bank Hapoalim, Leumi, Discount, Mizrahi etc: go to your app → Statements → Download PDF → Send here."
         );
@@ -123,45 +125,45 @@ async function processMessage(from, text, userName, msgData) {
       if (hasDocument) {
         const mimeType = hasDocument.mimetype || "application/pdf";
         if (!mimeType.includes("pdf")) {
-          return await sendMessage(from, "⚠️ Please send a PDF file. Other file types are not supported yet.");
+          return await send(from, "⚠️ Please send a PDF file. Other file types are not supported yet.");
         }
         const buffer = await downloadMedia(mediaUrl);
         extractedText = await extractTextFromPDF(buffer);
       }
 
       const analysis = await aiMod.analyseStatement(from, userName, extractedText);
-      return await sendMessage(from, analysis);
+      return await send(from, analysis);
     } catch (err) {
       console.error("❌ Media processing error:", err.message);
-      return await sendMessage(from, `⚠️ ${err.message || "I had trouble reading that file. Try a different PDF."}`);
+      return await send(from, `⚠️ ${err.message || "I had trouble reading that file. Try a different PDF."}`);
     }
   }
 
   // ── Quick commands ────────────────────────────────────────────────────────
   if (lower === "help" || lower === "menu") {
-    return await sendMessage(from, helpMenu(userName));
+    return await send(from, helpMenu(userName));
   }
 
   if (lower === "report") {
     const report = await aiMod.generateReport(from, userName);
-    return await sendMessage(from, report);
+    return await send(from, report);
   }
 
   if (lower === "balances") {
     const balances = await sheetsMod.getAccountBalances(from);
-    return await sendMessage(from, formatBalances(balances));
+    return await send(from, formatBalances(balances));
   }
 
   if (lower === "yes" && pendingSplits[from]) {
     const { splitPlan, totalAmount } = pendingSplits[from];
     delete pendingSplits[from];
     await sheetsMod.saveSplit(from, splitPlan, totalAmount);
-    return await sendMessage(from, "✅ Savings split saved!");
+    return await send(from, "✅ Savings split saved!");
   }
 
   if (lower === "no" && pendingSplits[from]) {
     delete pendingSplits[from];
-    return await sendMessage(from, "❌ Split cancelled.");
+    return await send(from, "❌ Split cancelled.");
   }
 
   // ── Log expense ───────────────────────────────────────────────────────────
@@ -175,7 +177,7 @@ async function processMessage(from, text, userName, msgData) {
       note: note || "",
     });
     aiMod.bustSheetCache(from);
-    return await sendMessage(
+    return await send(
       from,
       `💸 Logged: ₪${Number(amount).toLocaleString()} on ${category}${note ? ` (${note})` : ""}`
     );
@@ -195,12 +197,12 @@ async function processMessage(from, text, userName, msgData) {
     aiMod.bustSheetCache(from);
     const splitPlan = rulesMod.calculateSplit(amountNum);
     pendingSplits[from] = { splitPlan, totalAmount: amountNum };
-    return await sendMessage(from, formatSplitProposal(amountNum, splitPlan));
+    return await send(from, formatSplitProposal(amountNum, splitPlan));
   }
 
   // ── AI Q&A ────────────────────────────────────────────────────────────────
   const answer = await aiMod.ask(text, from, userName);
-  return await sendMessage(from, answer);
+  return await send(from, answer);
 }
 
 // ── Incoming webhook ──────────────────────────────────────────────────────────
@@ -307,3 +309,4 @@ help     → This menu`;
 }
 module.exports = router;
 module.exports.sendMessage = sendMessage;
+module.exports.processMessage = processMessage;
